@@ -5,12 +5,14 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'aapni_chai_starter_package (1).zip'
+      - 'aapni_chai_firebase_source.zip'
+      - 'google-services.json'
       - '.github/workflows/build.yml'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,13 +22,55 @@ jobs:
         with:
           channel: stable
 
-      - name: Unpack app source
-        run: unzip -o "aapni_chai_starter_package (1).zip" -d app_source
+      - name: Unpack Firebase app source
+        run: unzip -o aapni_chai_firebase_source.zip -d app_source
+
+      - name: Create Android project
+        working-directory: app_source
+        run: flutter create --platforms=android .
+
+      - name: Configure Firebase and package name
+        working-directory: app_source
+        run: |
+          test -f ../google-services.json
+          mkdir -p android/app
+          cp ../google-services.json android/app/google-services.json
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          settings = Path("android/settings.gradle.kts")
+          app = Path("android/app/build.gradle.kts")
+
+          s = settings.read_text()
+          s = s.replace(
+              "plugins {",
+              'plugins {\n    id("com.google.gms.google-services") version "4.4.2" apply false',
+              1
+          )
+          settings.write_text(s)
+
+          a = app.read_text()
+          a = a.replace(
+              "plugins {",
+              'plugins {\n    id("com.google.gms.google-services")',
+              1
+          )
+          a = re.sub(
+              r'namespace\s*=\s*"[^"]+"',
+              'namespace = "com.aapnichai.admin"', a
+          )
+          a = re.sub(
+              r'applicationId\s*=\s*"[^"]+"',
+              'applicationId = "com.aapnichai.admin"', a
+          )
+          app.write_text(a)
+          PY
 
       - name: Build APK
         working-directory: app_source
         run: |
-          flutter create --platforms=android .
           flutter pub get
           flutter build apk --release
 
