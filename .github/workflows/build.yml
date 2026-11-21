@@ -1,0 +1,37 @@
+
+name: Build AAPNI CHAI APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'aapni_chai_starter_package.zip'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Unpack app source
+        run: unzip -o aapni_chai_starter_package.zip -d app_source
+
+      - name: Build APK
+        working-directory: app_source
+        run: |
+          flutter create --platforms=android .
+          flutter pub get
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: aapni-chai-apk
+          path: app_source/build/app/outputs/flutter-apk/app-release.apk
