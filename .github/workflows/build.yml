@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'aapni_chai_starter_package.zip'
+      - 'aapni_chai_starter_package (1).zip'
       - '.github/workflows/build.yml'
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
           channel: stable
 
       - name: Unpack app source
-        run: unzip -o aapni_chai_starter_package.zip -d app_source
+        run: unzip -o "aapni_chai_starter_package (1).zip" -d app_source
 
       - name: Build APK
         working-directory: app_source
