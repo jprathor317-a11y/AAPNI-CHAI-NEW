@@ -27,7 +27,7 @@ jobs:
 
       - name: Create Android project
         working-directory: app_source
-        run: flutter create --platforms=android .
+        run: flutter create --platforms=android --org com.aapnichai --project-name admin2 .
 
       - name: Configure Firebase and package name
         working-directory: app_source
