@@ -59,11 +59,11 @@ jobs:
           )
           a = re.sub(
               r'namespace\s*=\s*"[^"]+"',
-              'namespace = "com.aapnichai.admin"', a
+              'namespace = "com.aapnichai.admin2"', a
           )
           a = re.sub(
               r'applicationId\s*=\s*"[^"]+"',
-              'applicationId = "com.aapnichai.admin"', a
+              'applicationId = "com.aapnichai.admin2"', a
           )
           app.write_text(a)
           PY
